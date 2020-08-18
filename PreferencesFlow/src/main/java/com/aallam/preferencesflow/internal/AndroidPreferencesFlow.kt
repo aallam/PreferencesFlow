@@ -6,6 +6,11 @@ import com.aallam.preferencesflow.PreferencesFlow
 import com.aallam.preferencesflow.internal.adapter.*
 import kotlinx.serialization.KSerializer
 
+/**
+ * Implementation of [PreferencesFlow].
+ *
+ * @param preferences Android SharedPreferences
+ */
 internal class AndroidPreferencesFlow(
     private val preferences: SharedPreferences
 ) : PreferencesFlow {

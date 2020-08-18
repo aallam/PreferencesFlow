@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 
+/**
+ * Implementation of [Preference]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class AndroidPreference<T>(
     override val key: String,

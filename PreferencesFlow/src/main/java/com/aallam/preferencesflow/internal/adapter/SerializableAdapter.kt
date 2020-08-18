@@ -7,6 +7,8 @@ import kotlinx.serialization.json.Json
 
 /**
  * Implementation of [PreferenceAdapter] for serializable objects.
+ *
+ * @param serializer serializer for encoding and decoding objects.
  */
 internal class SerializableAdapter<T>(private val serializer: KSerializer<T>) : PreferenceAdapter<T> {
 
