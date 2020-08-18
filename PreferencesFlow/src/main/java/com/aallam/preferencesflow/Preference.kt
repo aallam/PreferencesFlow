@@ -4,7 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 
-
 /**
  * A preference of type [T].
  **/
@@ -23,7 +22,7 @@ public interface Preference<T> {
     /**
      * Retrieve the current value for this preference.
      */
-    fun get(): T
+    fun get(): T?
 
     /**
      * Change this preference's stored value to [value].

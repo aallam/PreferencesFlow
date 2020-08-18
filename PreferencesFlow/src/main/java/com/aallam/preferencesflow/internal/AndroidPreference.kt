@@ -18,7 +18,7 @@ internal class AndroidPreference<T>(
     // initial value is the current value or defaultValue
     private val flow: MutableStateFlow<T> = MutableStateFlow(get() ?: defaultValue)
 
-    override fun get(): T {
+    override fun get(): T? {
         return adapter.get(key, preferences, defaultValue);
     }
 
