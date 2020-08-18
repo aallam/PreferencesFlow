@@ -3,9 +3,7 @@ package com.aallam.preferencesflow.internal
 import android.content.SharedPreferences
 import com.aallam.preferencesflow.Preference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 
 /**
  * Implementation of [Preference]
@@ -16,10 +14,14 @@ internal class AndroidPreference<T>(
     override val defaultValue: T,
     private val preferences: SharedPreferences,
     private val adapter: PreferenceAdapter<T>,
+    changesFlow: Flow<String?>,
 ) : Preference<T> {
 
-    // initial value is the current value or defaultValue
-    private val flow: MutableStateFlow<T> = MutableStateFlow(get() ?: defaultValue)
+    private val flow: Flow<T> = changesFlow
+        .filter { it == key || it == null }
+        .onStart { emit(null) } // Trigger
+        .map { get() ?: defaultValue }
+        .conflate()
 
     override fun get(): T? {
         return adapter.get(key, preferences, defaultValue);
@@ -44,10 +46,10 @@ internal class AndroidPreference<T>(
         return flow
     }
 
-    override fun asCollector(): FlowCollector<T> {
+    override fun asFlowCollector(): FlowCollector<T> {
         return object : FlowCollector<T> {
             override suspend fun emit(value: T) {
-                flow.value = value
+                set(value)
             }
         }
     }

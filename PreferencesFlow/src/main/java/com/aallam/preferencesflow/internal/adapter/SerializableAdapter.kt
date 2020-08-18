@@ -10,15 +10,15 @@ import kotlinx.serialization.json.Json
  *
  * @param serializer serializer for encoding and decoding objects.
  */
-internal class SerializableAdapter<T>(private val serializer: KSerializer<T>) : PreferenceAdapter<T> {
+internal class SerializableAdapter<T>(private val serializer: KSerializer<T>) : PreferenceAdapter<T?> {
 
-    override fun get(key: String, preferences: SharedPreferences, defaultValue: T): T? {
+    override fun get(key: String, preferences: SharedPreferences, defaultValue: T?): T? {
         val raw = preferences.getString(key, null) ?: return defaultValue
         return Json.decodeFromString(serializer, raw)
     }
 
-    override fun set(key: String, value: T, editor: SharedPreferences.Editor) {
-        val serialized = Json.encodeToString(serializer, value)
+    override fun set(key: String, value: T?, editor: SharedPreferences.Editor) {
+        val serialized = value?.let { Json.encodeToString(serializer, it) }
         editor.putString(key, serialized)
     }
 }

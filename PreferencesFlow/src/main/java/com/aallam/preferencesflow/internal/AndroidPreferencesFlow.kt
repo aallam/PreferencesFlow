@@ -4,6 +4,10 @@ import android.content.SharedPreferences
 import com.aallam.preferencesflow.Preference
 import com.aallam.preferencesflow.PreferencesFlow
 import com.aallam.preferencesflow.internal.adapter.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.KSerializer
 
 /**
@@ -15,96 +19,79 @@ internal class AndroidPreferencesFlow(
     private val preferences: SharedPreferences
 ) : PreferencesFlow {
 
-    /**
-     * Create a boolean preference for [key]. Default is false.
-     */
-    override fun getBoolean(key: String): Preference<Boolean> {
-        return getBoolean(key, DEFAULT_BOOLEAN)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val prefsKeyFlow: Flow<String?> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -> offer(key) }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    /**
-     * Create a boolean preference for [key] with a default of [defaultValue].
-     */
-    override fun getBoolean(key: String, defaultValue: Boolean): Preference<Boolean> {
-        return AndroidPreference(key, defaultValue, preferences, BooleanAdapter)
+    override fun boolean(key: String): Preference<Boolean> {
+        return boolean(key, DEFAULT_BOOLEAN)
     }
 
-
-    /**
-     * Create a float preference for [key]. Default is 0.
-     */
-    override fun getFloat(key: String): Preference<Float> {
-        return getFloat(key, DEFAULT_FLOAT)
+    override fun boolean(key: String, defaultValue: Boolean): Preference<Boolean> {
+        return AndroidPreference(key, defaultValue, preferences, BooleanAdapter, prefsKeyFlow)
     }
 
-    /**
-     * Create a [Float] preference for [key] with a default of [defaultValue].
-     */
-    override fun getFloat(key: String, defaultValue: Float): Preference<Float> {
-        return AndroidPreference(key, defaultValue, preferences, FloatAdapter)
+    override fun float(key: String): Preference<Float> {
+        return float(key, DEFAULT_FLOAT)
     }
 
-    /**
-     * Create a float preference for [key]. Default is 0.
-     */
-    override fun getInteger(key: String): Preference<Int> {
-        return getInteger(key, DEFAULT_INTEGER)
+    override fun float(key: String, defaultValue: Float): Preference<Float> {
+        return AndroidPreference(key, defaultValue, preferences, FloatAdapter, prefsKeyFlow)
     }
 
-    /**
-     * Create a [Float] preference for [key] with a default of [defaultValue].
-     */
-    override fun getInteger(key: String, defaultValue: Int): Preference<Int> {
-        return AndroidPreference(key, defaultValue, preferences, IntegerAdapter)
+    override fun int(key: String): Preference<Int> {
+        return int(key, DEFAULT_INTEGER)
     }
 
-    /**
-     * Create a float preference for [key]. Default is 0L.
-     */
-    override fun getLong(key: String): Preference<Long> {
-        return getLong(key, DEFAULT_LONG)
+    override fun int(key: String, defaultValue: Int): Preference<Int> {
+        return AndroidPreference(key, defaultValue, preferences, IntegerAdapter, prefsKeyFlow)
     }
 
-    /**
-     * Create a [Long] preference for [key] with a default of [defaultValue].
-     */
-    override fun getLong(key: String, defaultValue: Long): Preference<Long> {
-        return AndroidPreference(key, defaultValue, preferences, LongAdapter)
+    override fun long(key: String): Preference<Long> {
+        return long(key, DEFAULT_LONG)
     }
 
-    /**
-     * Create a preference for type [T] for [key] with a default of [defaultValue].
-     */
-    override fun <T> getSerializable(key: String, defaultValue: T, serializable: KSerializer<T>): Preference<T> {
-        return AndroidPreference(key, defaultValue, preferences, SerializableAdapter(serializable))
+    override fun long(key: String, defaultValue: Long): Preference<Long> {
+        return AndroidPreference(key, defaultValue, preferences, LongAdapter, prefsKeyFlow)
+    }
+
+    override fun <T> serializable(key: String, serializable: KSerializer<T>): Preference<T?> {
+        return serializable(key, null, serializable)
+    }
+
+    override fun <T> serializable(key: String, defaultValue: T?, serializable: KSerializer<T>): Preference<T?> {
+        return AndroidPreference(key, defaultValue, preferences, SerializableAdapter(serializable), prefsKeyFlow)
     }
 
     /**
      * Create a float preference for [key]. Default is empty string.
      */
-    override fun getString(key: String): Preference<String?> {
-        return getString(key, DEFAULT_STRING)
+    override fun string(key: String): Preference<String?> {
+        return string(key, DEFAULT_STRING)
     }
 
     /**
      * Create a [String] preference for [key] with a default of [defaultValue].
      */
-    override fun getString(key: String, defaultValue: String): Preference<String?> {
-        return AndroidPreference(key, defaultValue, preferences, StringAdapter)
+    override fun string(key: String, defaultValue: String?): Preference<String?> {
+        return AndroidPreference(key, defaultValue, preferences, StringAdapter, prefsKeyFlow)
     }
 
     /**
      * Create a string set preference for {@code key}. Default is [EmptySet].
      */
-    override fun getStringSet(key: String): Preference<Set<String>?> {
-        return getStringSet(key, emptySet())
+    override fun stringSet(key: String): Preference<Set<String>?> {
+        return stringSet(key, emptySet())
     }
 
     /**
      * Create a [String] set preference for [key] with a default of [defaultValue].
      */
-    override fun getStringSet(key: String, defaultValue: Set<String>?): Preference<Set<String>?> {
-        return AndroidPreference(key, defaultValue, preferences, StringSetAdapter)
+    override fun stringSet(key: String, defaultValue: Set<String>?): Preference<Set<String>?> {
+        return AndroidPreference(key, defaultValue, preferences, StringSetAdapter, prefsKeyFlow)
     }
 
     /**

@@ -48,5 +48,5 @@ public interface Preference<T> {
     /**
      * An action which stores a new value for this preference.
      */
-    public fun asCollector(): FlowCollector<T>
+    public fun asFlowCollector(): FlowCollector<T>
 }
