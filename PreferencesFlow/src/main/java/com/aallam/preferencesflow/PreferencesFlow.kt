@@ -2,7 +2,9 @@
 
 package com.aallam.preferencesflow
 
+import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import com.aallam.preferencesflow.internal.AndroidPreferencesFlow
 import kotlinx.serialization.KSerializer
 
@@ -89,3 +91,10 @@ public interface PreferencesFlow {
  * @param preferences Android SharedPreferences
  */
 public fun PreferencesFlow(preferences: SharedPreferences): PreferencesFlow = AndroidPreferencesFlow(preferences)
+
+/**
+ * Create a [PreferencesFlow] instance.
+ *
+ * @param context Android context
+ */
+public fun PreferencesFlow(context: Context): PreferencesFlow = PreferencesFlow(getDefaultSharedPreferences(context))
