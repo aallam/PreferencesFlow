@@ -1,4 +1,7 @@
 buildscript {
+    ext {
+        kotlin_version = '1.4.0'
+    }
     ext.buildConfig = ['minSdkVersion'    : 21,
                        'compileSdkVersion': 30,
                        'targetSdkVersion' : 30,
@@ -21,9 +24,6 @@ subprojects {
         google()
         jcenter()
     }
-
-    group GROUP
-    version VERSION_NAME
 }
 
 task clean(type: Delete) {
